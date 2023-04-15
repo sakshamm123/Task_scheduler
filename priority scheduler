@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_JOBS 100
+
+// Struct to store job details
+struct job {
+    int id;             // Job ID
+    int est_run_time;   // Estimated run time
+    int waiting_time;   // Waiting time
+    float priority;     // Priority
+};
+
+int main() {
+    struct job jobs[MAX_JOBS];   // Array of jobs
+    int num_jobs, i, j, time = 0; // Variables to store number of jobs, loop counters and current time
+    float total_waiting_time = 0.0, avg_waiting_time; // Variables to store total and average waiting time
+
+    // Get input from user
+    printf("Enter the number of jobs: ");
+    scanf("%d", &num_jobs);
+    for (i = 0; i < num_jobs; i++) {
+        printf("Enter the estimated run time for job %d: ", i+1);
+        scanf("%d", &jobs[i].est_run_time);
+        jobs[i].id = i+1;
+        jobs[i].waiting_time = 0;
+        jobs[i].priority = 1.0;
+    }
+
+    // Execute jobs until all are completed
+    while (num_jobs > 0) {
+        // Calculate priority for each job
+        for (i = 0; i < num_jobs; i++) {
+            if (jobs[i].waiting_time > 0) {
+                jobs[i].priority = 1.0 + (float)jobs[i].waiting_time / (float)jobs[i].est_run_time;
+            }
+        }
+
+        // Sort jobs based on priority
+        for (i = 0; i < num_jobs-1; i++) {
+            for (j = i+1; j < num_jobs; j++) {
+                if (jobs[j].priority > jobs[i].priority) {
+                    // Swap jobs
+                    struct job temp = jobs[i];
+                    jobs[i] = jobs[j];
+                    jobs[j] = temp;
+                }
+            }
+        }
+
+        // Execute first job in sorted list
+        struct job* current_job = &jobs[0];
+        printf("%d| Job %d - ", time, current_job->id);
+        current_job->est_run_time--;
+        if (current_job->est_run_time == 0) {
+            // Job is completed
+            current_job->waiting_time = time - current_job->waiting_time - current_job->est_run_time;
+            total_waiting_time += (float)current_job->waiting_time;
+            for (i = 0; i < num_jobs-1; i++) {
+                jobs[i] = jobs[i+1];
+            }
+            num_jobs--;
+            printf("Waiting time for job %d: %d\n", current_job->id, current_job->waiting_time);
+        }
+
+        // Increment waiting time for all waiting jobs
+        for (i = 0; i < num_jobs; i++) {
+            if (jobs[i].waiting_time == 0 && &jobs[i] != current_job) {
+                jobs[i].waiting_time = time;
+            }
+        }
+
+        // Display priority and waiting time for each job
+        printf("Priority: ");
+        for (i = 0; i < num_jobs; i++) {
+            printf("Job %d: %.2f (WT: %d) ", jobs[i].id, jobs[i].priority, jobs[i].waiting_time);
+        }
+        printf("\n");
+
+        // Increment time
+        time++;
+    }
+
+    // compute average waiting time
+    avg_waiting_time = total_waiting_time / (float)(num_jobs + 1);
+    printf("Average waiting time: %.2f\n", avg_waiting_time);
+
+    return 0;
+}
