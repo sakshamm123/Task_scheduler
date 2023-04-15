@@ -15,10 +15,11 @@ int main() {
     struct job jobs[MAX_JOBS];   // Array of jobs
     int num_jobs, i, j, time = 0; // Variables to store number of jobs, loop counters and current time
     float total_waiting_time = 0.0, avg_waiting_time; // Variables to store total and average waiting time
-
+	int num_jobs_1;
     // Get input from user
     printf("Enter the number of jobs: ");
     scanf("%d", &num_jobs);
+    num_jobs_1=num_jobs;
     for (i = 0; i < num_jobs; i++) {
         printf("Enter the estimated run time for job %d: ", i+1);
         scanf("%d", &jobs[i].est_run_time);
@@ -60,7 +61,7 @@ int main() {
                 jobs[i] = jobs[i+1];
             }
             num_jobs--;
-            printf("Waiting time for job %d: %d\n", current_job->id, current_job->waiting_time);
+            //printf("Waiting time for job %d: %d\n", current_job->id, current_job->waiting_time);
         }
 
         // Increment waiting time for all waiting jobs
@@ -80,9 +81,10 @@ int main() {
         // Increment time
         time++;
     }
-
+    printf("Total Jobs: %d\n",num_jobs_1);
+	printf("Total waiting time: %.2f\n",total_waiting_time);
     // compute average waiting time
-    avg_waiting_time = total_waiting_time / (float)(num_jobs + 1);
+    avg_waiting_time = total_waiting_time / (int)(num_jobs_1);
     printf("Average waiting time: %.2f\n", avg_waiting_time);
 
     return 0;
